@@ -1,0 +1,11 @@
+[tool.poetry]
+name = "ArcaneIntelligence"
+version = "0.1.0"
+description = "Toy AI Project"
+authors = ["ysj1173886760@gmail.com"]
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^1.10.12"
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

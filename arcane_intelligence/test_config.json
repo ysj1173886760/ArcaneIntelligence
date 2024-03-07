@@ -1,0 +1,16 @@
+{
+"database": {
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "password"
+},
+"logging": {
+  "level": "INFO",
+  "file": "app.log"
+},
+"app": {
+    "name": "My App",
+    "version": "1.0.0"
+}
+}
