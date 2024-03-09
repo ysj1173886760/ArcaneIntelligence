@@ -1,6 +1,7 @@
 import abc
-from typing import Callable, Literal, Optional
+from typing import Callable, Literal, Optional, TypedDict
 from pydantic import BaseModel
+from utils.json_schema import JSONSchema
 import enum
 
 class ChatMessage(BaseModel):
@@ -19,6 +20,10 @@ class ChatMessage(BaseModel):
     @staticmethod
     def system(content: str) -> "ChatMessage":
         return ChatMessage(role=ChatMessage.Role.SYSTEM, content=content)
+
+class ChatMessageDict(TypedDict):
+    role: str
+    content: str
 
 class AssistantChatMessage(ChatMessage):
     role: Literal["assistant"] = "assistant"
@@ -41,4 +46,44 @@ class ChatModelProvider():
       **kwargs,
   ) -> ModelResponse:
       ...
+
+class CompletionModelFunction(BaseModel):
+    """General representation object for LLM-callable functions."""
+
+    name: str
+    description: str
+    parameters: dict[str, "JSONSchema"]
+
+    @property
+    def schema(self) -> dict[str, str | dict | list]:
+        """Returns an OpenAI-consumable function specification"""
+
+        return {
+            "name": self.name,
+            "description": self.description,
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    name: param.to_dict() for name, param in self.parameters.items()
+                },
+                "required": [
+                    name for name, param in self.parameters.items() if param.required
+                ],
+            },
+        }
+
+    @staticmethod
+    def parse(schema: dict) -> "CompletionModelFunction":
+        return CompletionModelFunction(
+            name=schema["name"],
+            description=schema["description"],
+            parameters=JSONSchema.parse_properties(schema["parameters"]),
+        )
+
+    def fmt_line(self) -> str:
+        params = ", ".join(
+            f"{name}{'?' if not p.required else ''}: " f"{p.typescript_type}"
+            for name, p in self.parameters.items()
+        )
+        return f"{self.name}: {self.description}. Params: ({params})"
 
