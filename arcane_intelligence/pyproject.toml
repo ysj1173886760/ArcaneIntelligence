@@ -7,6 +7,8 @@ authors = ["ysj1173886760@gmail.com"]
 python = "^3.11"
 pydantic = "^1.10.12"
 openai = "^1.13.3"
+llama-index = "^0.10.18"
+jsonschema = "^4.21.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
