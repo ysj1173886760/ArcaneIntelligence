@@ -14,8 +14,11 @@ TODO(sheep): more architecture details
 
 # Roadmap
 
-[] Implement LLM provider, chat with LLM first
-[] Implement Abilities
+[x] Implement LLM provider, chat with LLM first
+[] Test LLAMA Index
+  [] Implement llama index based on MoonshotAI
+[] Test LangChain
 [] Implement Planning
+[] Implement Abilities
 [] Combine above components and implement simple agent
 [] Introduce memory subsystem
