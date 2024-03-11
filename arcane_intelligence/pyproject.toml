@@ -5,11 +5,12 @@ description = "Toy AI Project"
 authors = ["ysj1173886760@gmail.com"]
 [tool.poetry.dependencies]
 python = "^3.11"
-pydantic = "^1.10.12"
 openai = "^1.13.3"
 llama-index = "^0.10.18"
 jsonschema = "^4.21.1"
 llama-index-embeddings-huggingface = "^0.1.4"
+pydantic = "^2.6.3"
+zhipuai = "^2.0.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
