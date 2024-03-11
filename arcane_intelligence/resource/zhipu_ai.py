@@ -19,9 +19,10 @@ class ZhipuAIProvider(ChatModelProvider, EmbeddingModelProvider):
     raw_messages = [
       message.dict(include={"role", "content"}) for message in messages
     ]
-    chat_completion = self._client.chat.completions.create(messages=raw_messages, model=model_name)
 
-    logging.debug('chat response: {} prompt token used: {} completion token used: {} total token used: {}'.format(chat_completion.choices[0].message.content, chat_completion.usage.prompt_tokens, chat_completion.usage.completion_tokens, chat_completion.usage.total_tokens))
+    chat_completion = self._client.chat.completions.create(messages=raw_messages, model=model_name, **kwargs)
+
+    logging.debug('chat response: {} prompt token used: {} completion token used: {} total token used: {}'.format(chat_completion.choices[0].message, chat_completion.usage.prompt_tokens, chat_completion.usage.completion_tokens, chat_completion.usage.total_tokens))
 
     return ChatModelResponse(result=ZhipuAIProvider._parse_completion_message(chat_completion.choices[0].message), prompt_tokens_used=chat_completion.usage.prompt_tokens, completion_tokens_used=chat_completion.usage.completion_tokens)
 
