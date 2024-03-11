@@ -1,5 +1,5 @@
 import abc
-from typing import Callable, Literal, Optional, TypedDict
+from typing import Callable, Literal, Optional, TypedDict, List
 from pydantic import BaseModel, Field
 from utils.json_schema import JSONSchema
 import enum
@@ -34,15 +34,17 @@ class ModelResponse(BaseModel):
 
     prompt_tokens_used: int
     completion_tokens_used: int
-    result: AssistantChatMessage
     # model_info: ModelInfo
 
-Embedding = list[float]
+Embedding = List[float]
 
 class EmbeddingModelResponse(ModelResponse):
     """Standard response struct for a response from an embedding model."""
+    embedding: Embedding
 
-    embedding: Embedding = Field(default_factory=list)
+class ChatModelResponse(ModelResponse):
+    """Standard response struct for a response from a language model."""
+    result: AssistantChatMessage
 
 class EmbeddingModelProvider(abc.ABC):
   @abc.abstractmethod
@@ -56,7 +58,7 @@ class ChatModelProvider(abc.ABC):
       messages: list[ChatMessage],
       model_name: str,
       **kwargs,
-  ) -> ModelResponse:
+  ) -> ChatModelResponse:
       ...
 
 class CompletionModelFunction(BaseModel):
