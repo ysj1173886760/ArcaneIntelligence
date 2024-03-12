@@ -21,6 +21,24 @@ class ChatMessage(BaseModel):
     def system(content: str) -> "ChatMessage":
         return ChatMessage(role=ChatMessage.Role.SYSTEM, content=content)
 
+class AssistantFunctionCall(BaseModel):
+    name: str
+    arguments: str
+
+class AssistantFunctionCallDict(TypedDict):
+    name: str
+    arguments: str
+
+class AssistantToolCall(BaseModel):
+    id: str
+    type: Literal["function"]
+    function: AssistantFunctionCall
+
+class AssistantToolCallDict(TypedDict):
+    id: str
+    type: Literal["function"]
+    function: AssistantFunctionCallDict
+
 class ChatMessageDict(TypedDict):
     role: str
     content: str
@@ -28,6 +46,7 @@ class ChatMessageDict(TypedDict):
 class AssistantChatMessage(ChatMessage):
     role: Literal["assistant"] = "assistant"
     content: Optional[str]
+    tool_calls: Optional[list[AssistantToolCall]] = None
 
 class ModelResponse(BaseModel):
     """Standard response struct for a response from a model."""

@@ -1,7 +1,7 @@
 from zhipuai import ZhipuAI
 from zhipuai.types.chat.chat_completion import CompletionMessage
 from zhipuai.types.embeddings import EmbeddingsResponded
-from resource.schema import ChatMessage, ModelResponse, ChatModelProvider, AssistantChatMessage, EmbeddingModelResponse, EmbeddingModelProvider, ChatModelResponse
+from resource.schema import ChatMessage, ModelResponse, ChatModelProvider, AssistantChatMessage, EmbeddingModelResponse, EmbeddingModelProvider, ChatModelResponse, AssistantToolCall, AssistantFunctionCall
 import logging
 from typing import List
 
@@ -13,7 +13,10 @@ class ZhipuAIProvider(ChatModelProvider, EmbeddingModelProvider):
 
   @staticmethod
   def _parse_completion_message(chat_completion_message: CompletionMessage) -> AssistantChatMessage:
-      return AssistantChatMessage(role=chat_completion_message.role, content=chat_completion_message.content)
+    tool_calls = None
+    if chat_completion_message.tool_calls is not None:
+      tool_calls = [AssistantToolCall(id=tool_call_rsp.id, type=tool_call_rsp.type, function=AssistantFunctionCall(name=tool_call_rsp.function.name, arguments=tool_call_rsp.function.arguments)) for tool_call_rsp in chat_completion_message.tool_calls]
+    return AssistantChatMessage(role=chat_completion_message.role, content=chat_completion_message.content, tool_calls=tool_calls)
 
   async def create_chat_completion(self, messages: list[ChatMessage], model_name: str, **kwargs) -> ChatModelResponse:
     raw_messages = [
