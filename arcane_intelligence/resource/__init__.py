@@ -1,9 +1,16 @@
-from resource.moonshot_ai import (
-  MoonshotAIProvider
-)
+from resource.moonshot_ai import MoonshotAIProvider
 from resource.zhipu_ai import ZhipuAIProvider
 
-from resource.schema import ChatMessage, AssistantChatMessage, ModelResponse, EmbeddingModelResponse, Embedding, ChatModelResponse, AssistantToolCall, AssistantFunctionCall
+from resource.schema import (
+    ChatMessage,
+    AssistantChatMessage,
+    ModelResponse,
+    EmbeddingModelResponse,
+    Embedding,
+    ChatModelResponse,
+    AssistantToolCall,
+    AssistantFunctionCall,
+)
 
 __all__ = [
     "MoonshotAIProvider",
@@ -15,5 +22,5 @@ __all__ = [
     "ZhipuAIProvider",
     "ChatModelResponse",
     "AssistantToolCall",
-    "AssistantFunctionCall"
+    "AssistantFunctionCall",
 ]

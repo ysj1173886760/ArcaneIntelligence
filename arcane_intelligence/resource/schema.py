@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from utils.json_schema import JSONSchema
 import enum
 
+
 class ChatMessage(BaseModel):
     class Role(str, enum.Enum):
         USER = "user"
@@ -21,32 +22,39 @@ class ChatMessage(BaseModel):
     def system(content: str) -> "ChatMessage":
         return ChatMessage(role=ChatMessage.Role.SYSTEM, content=content)
 
+
 class AssistantFunctionCall(BaseModel):
     name: str
     arguments: str
 
+
 class AssistantFunctionCallDict(TypedDict):
     name: str
     arguments: str
+
 
 class AssistantToolCall(BaseModel):
     id: str
     type: Literal["function"]
     function: AssistantFunctionCall
 
+
 class AssistantToolCallDict(TypedDict):
     id: str
     type: Literal["function"]
     function: AssistantFunctionCallDict
 
+
 class ChatMessageDict(TypedDict):
     role: str
     content: str
+
 
 class AssistantChatMessage(ChatMessage):
     role: Literal["assistant"] = "assistant"
     content: Optional[str]
     tool_calls: Optional[list[AssistantToolCall]] = None
+
 
 class ModelResponse(BaseModel):
     """Standard response struct for a response from a model."""
@@ -55,30 +63,40 @@ class ModelResponse(BaseModel):
     completion_tokens_used: int
     # model_info: ModelInfo
 
+
 Embedding = List[float]
+
 
 class EmbeddingModelResponse(ModelResponse):
     """Standard response struct for a response from an embedding model."""
+
     embedding: Embedding
+
 
 class ChatModelResponse(ModelResponse):
     """Standard response struct for a response from a language model."""
+
     result: AssistantChatMessage
 
+
 class EmbeddingModelProvider(abc.ABC):
-  @abc.abstractmethod
-  async def create_embedding(self, text: str, model_name: str) -> EmbeddingModelResponse:
-    ...
+    @abc.abstractmethod
+    async def create_embedding(
+        self, text: str, model_name: str
+    ) -> EmbeddingModelResponse:
+        ...
+
 
 class ChatModelProvider(abc.ABC):
-  @abc.abstractmethod
-  async def create_chat_completion(
-      self,
-      messages: list[ChatMessage],
-      model_name: str,
-      **kwargs,
-  ) -> ChatModelResponse:
-      ...
+    @abc.abstractmethod
+    async def create_chat_completion(
+        self,
+        messages: list[ChatMessage],
+        model_name: str,
+        **kwargs,
+    ) -> ChatModelResponse:
+        ...
+
 
 class CompletionModelFunction(BaseModel):
     """General representation object for LLM-callable functions."""
@@ -119,4 +137,3 @@ class CompletionModelFunction(BaseModel):
             for name, p in self.parameters.items()
         )
         return f"{self.name}: {self.description}. Params: ({params})"
-

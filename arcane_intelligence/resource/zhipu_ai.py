@@ -1,41 +1,100 @@
 from zhipuai import ZhipuAI
 from zhipuai.types.chat.chat_completion import CompletionMessage
 from zhipuai.types.embeddings import EmbeddingsResponded
-from resource.schema import ChatMessage, ModelResponse, ChatModelProvider, AssistantChatMessage, EmbeddingModelResponse, EmbeddingModelProvider, ChatModelResponse, AssistantToolCall, AssistantFunctionCall
+from resource.schema import (
+    ChatMessage,
+    ModelResponse,
+    ChatModelProvider,
+    AssistantChatMessage,
+    EmbeddingModelResponse,
+    EmbeddingModelProvider,
+    ChatModelResponse,
+    AssistantToolCall,
+    AssistantFunctionCall,
+)
 import logging
 from typing import List
 
+
 class ZhipuAIProvider(ChatModelProvider, EmbeddingModelProvider):
-  _client: ZhipuAI
+    _client: ZhipuAI
 
-  def __init__(self, api_key: str):
-    self._client = ZhipuAI(api_key=api_key)
+    def __init__(self, api_key: str):
+        self._client = ZhipuAI(api_key=api_key)
 
-  @staticmethod
-  def _parse_completion_message(chat_completion_message: CompletionMessage) -> AssistantChatMessage:
-    tool_calls = None
-    if chat_completion_message.tool_calls is not None:
-      tool_calls = [AssistantToolCall(id=tool_call_rsp.id, type=tool_call_rsp.type, function=AssistantFunctionCall(name=tool_call_rsp.function.name, arguments=tool_call_rsp.function.arguments)) for tool_call_rsp in chat_completion_message.tool_calls]
-    return AssistantChatMessage(role=chat_completion_message.role, content=chat_completion_message.content, tool_calls=tool_calls)
+    @staticmethod
+    def _parse_completion_message(
+        chat_completion_message: CompletionMessage,
+    ) -> AssistantChatMessage:
+        tool_calls = None
+        if chat_completion_message.tool_calls is not None:
+            tool_calls = [
+                AssistantToolCall(
+                    id=tool_call_rsp.id,
+                    type=tool_call_rsp.type,
+                    function=AssistantFunctionCall(
+                        name=tool_call_rsp.function.name,
+                        arguments=tool_call_rsp.function.arguments,
+                    ),
+                )
+                for tool_call_rsp in chat_completion_message.tool_calls
+            ]
+        return AssistantChatMessage(
+            role=chat_completion_message.role,
+            content=chat_completion_message.content,
+            tool_calls=tool_calls,
+        )
 
-  async def create_chat_completion(self, messages: list[ChatMessage], model_name: str, **kwargs) -> ChatModelResponse:
-    raw_messages = [
-      message.dict(include={"role", "content"}) for message in messages
-    ]
+    async def create_chat_completion(
+        self, messages: list[ChatMessage], model_name: str, **kwargs
+    ) -> ChatModelResponse:
+        raw_messages = [
+            message.dict(include={"role", "content"}) for message in messages
+        ]
 
-    chat_completion = self._client.chat.completions.create(messages=raw_messages, model=model_name, **kwargs)
+        chat_completion = self._client.chat.completions.create(
+            messages=raw_messages, model=model_name, **kwargs
+        )
 
-    logging.debug('chat response: {} prompt token used: {} completion token used: {} total token used: {}'.format(chat_completion.choices[0].message, chat_completion.usage.prompt_tokens, chat_completion.usage.completion_tokens, chat_completion.usage.total_tokens))
+        logging.debug(
+            "chat response: {} prompt token used: {} completion token used: {} total token used: {}".format(
+                chat_completion.choices[0].message,
+                chat_completion.usage.prompt_tokens,
+                chat_completion.usage.completion_tokens,
+                chat_completion.usage.total_tokens,
+            )
+        )
 
-    return ChatModelResponse(result=ZhipuAIProvider._parse_completion_message(chat_completion.choices[0].message), prompt_tokens_used=chat_completion.usage.prompt_tokens, completion_tokens_used=chat_completion.usage.completion_tokens)
+        return ChatModelResponse(
+            result=ZhipuAIProvider._parse_completion_message(
+                chat_completion.choices[0].message
+            ),
+            prompt_tokens_used=chat_completion.usage.prompt_tokens,
+            completion_tokens_used=chat_completion.usage.completion_tokens,
+        )
 
-  @staticmethod
-  def _parse_embedding(embedding_response: EmbeddingsResponded) -> List[float]:
-      return embedding_response.data[0].embedding
-  
-  async def create_embedding(self, text: str, model_name: str) -> EmbeddingModelResponse:
-    embedding_response : EmbeddingsResponded = self._client.embeddings.create(input=text, model=model_name)
+    @staticmethod
+    def _parse_embedding(embedding_response: EmbeddingsResponded) -> List[float]:
+        return embedding_response.data[0].embedding
 
-    logging.debug('create embedding response: {} prompt token used: {} completion token used: {} total token used: {}'.format(embedding_response.data, embedding_response.usage.prompt_tokens, embedding_response.usage.completion_tokens, embedding_response.usage.total_tokens))
-    
-    return EmbeddingModelResponse(embedding=ZhipuAIProvider._parse_embedding(embedding_response), prompt_tokens_used=embedding_response.usage.prompt_tokens, completion_tokens_used=embedding_response.usage.completion_tokens)
+    async def create_embedding(
+        self, text: str, model_name: str
+    ) -> EmbeddingModelResponse:
+        embedding_response: EmbeddingsResponded = self._client.embeddings.create(
+            input=text, model=model_name
+        )
+
+        logging.debug(
+            "create embedding response: {} prompt token used: {} completion token used: {} total token used: {}".format(
+                embedding_response.data,
+                embedding_response.usage.prompt_tokens,
+                embedding_response.usage.completion_tokens,
+                embedding_response.usage.total_tokens,
+            )
+        )
+
+        return EmbeddingModelResponse(
+            embedding=ZhipuAIProvider._parse_embedding(embedding_response),
+            prompt_tokens_used=embedding_response.usage.prompt_tokens,
+            completion_tokens_used=embedding_response.usage.completion_tokens,
+        )

@@ -1,6 +1,12 @@
 import abc
 from pydantic import BaseModel, Field
-from resource.schema import ChatMessage, AssistantChatMessage, CompletionModelFunction, ChatMessageDict
+from resource.schema import (
+    ChatMessage,
+    AssistantChatMessage,
+    CompletionModelFunction,
+    ChatMessageDict,
+)
+
 
 class ChatPrompt(BaseModel):
     messages: list[ChatMessage]
@@ -14,9 +20,9 @@ class ChatPrompt(BaseModel):
             f"{m.role.value.upper()}: {m.content}" for m in self.messages
         )
 
+
 class PromptStrategy(abc.ABC):
     @property
-
     @abc.abstractmethod
     def build_prompt(self, *_, **kwargs) -> ChatPrompt:
         ...
