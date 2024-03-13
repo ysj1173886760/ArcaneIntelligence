@@ -1,9 +1,7 @@
 from langchain_community.document_loaders.generic import GenericLoader
 from langchain_community.document_loaders.parsers import LanguageParser
 from langchain_text_splitters import Language
-
-import tree_sitter
-import tree_sitter_languages
+from langchain_community.vectorstores import faiss
 
 import argparse
 
@@ -20,3 +18,6 @@ documents = loader.load()
 print(len(documents))
 
 print(documents[0])
+
+db = faiss.FAISS.from_documents(documents)
+retriever = db.as_retriever()
