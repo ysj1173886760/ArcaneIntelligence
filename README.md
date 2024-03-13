@@ -12,6 +12,16 @@ Basically, we have Agent, Planning, Resources, Abilities and Memory. I've remove
 
 TODO(sheep): more architecture details
 
+# Run
+
+```shell
+python3 -m venv .venv
+source .venv/bin/activate
+cd arcane_intelligence
+poetry install
+python main.py
+```
+
 # Roadmap
 
 - [x] Implement LLM provider, chat with LLM first
