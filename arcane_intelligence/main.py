@@ -9,16 +9,9 @@ import logging
 async def main():
     import sys
 
-    if len(sys.argv) < 2:
-        print("Usage: python config.py <config_file_path>")
-        sys.exit(1)
-
     logging.basicConfig(
         level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
     )
-
-    config_file_path = sys.argv[1]
-    GlobalConfig.init_config(config_file_path)
 
     ai_provider = MoonshotAIProvider(os.environ.get("MOONSHOT_API_KEY"))
 
